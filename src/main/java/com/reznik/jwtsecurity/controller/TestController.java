@@ -1,7 +1,7 @@
 package com.reznik.jwtsecurity.controller;
 
 import com.reznik.jwtsecurity.services.UserService;
-import com.reznik.jwtsecurity.user.User;
+import com.reznik.jwtsecurity.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +20,6 @@ public class TestController {
     public ResponseEntity<String> sayHello(){
         return ResponseEntity.ok("Hello from secured app");
     }
-
-//    @GetMapping("/protected")
-//    @Secured("ADMIN") // Role-based authorization
-//    public String protectedResource() {
-//        return "This is a protected resource.";
-//    }
 
     @GetMapping("/me")
     public ResponseEntity<User> readUser() {

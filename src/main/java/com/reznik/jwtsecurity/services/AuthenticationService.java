@@ -3,8 +3,8 @@ package com.reznik.jwtsecurity.services;
 import com.reznik.jwtsecurity.dto.AuthenticationRequest;
 import com.reznik.jwtsecurity.dto.AuthenticationResponse;
 import com.reznik.jwtsecurity.dto.AuthorizationRequest;
-import com.reznik.jwtsecurity.user.Role;
-import com.reznik.jwtsecurity.user.User;
+import com.reznik.jwtsecurity.entity.Role;
+import com.reznik.jwtsecurity.entity.User;
 import com.reznik.jwtsecurity.repos.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,8 +12,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor

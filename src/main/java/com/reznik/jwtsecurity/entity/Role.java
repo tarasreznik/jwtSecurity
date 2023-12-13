@@ -1,4 +1,4 @@
-package com.reznik.jwtsecurity.user;
+package com.reznik.jwtsecurity.entity;
 
 public enum Role {
     USER,

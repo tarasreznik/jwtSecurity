@@ -1,8 +1,8 @@
 package com.reznik.jwtsecurity.config;
 
 import com.reznik.jwtsecurity.repos.UserRepository;
-import com.reznik.jwtsecurity.user.Role;
-import com.reznik.jwtsecurity.user.User;
+import com.reznik.jwtsecurity.entity.Role;
+import com.reznik.jwtsecurity.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;

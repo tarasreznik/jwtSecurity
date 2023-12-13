@@ -1,15 +1,13 @@
 package com.reznik.jwtsecurity.services;
 
 import com.reznik.jwtsecurity.repos.UserRepository;
-import com.reznik.jwtsecurity.user.User;
+import com.reznik.jwtsecurity.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor

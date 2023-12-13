@@ -1,6 +1,6 @@
 package com.reznik.jwtsecurity.repos;
 
-import com.reznik.jwtsecurity.user.User;
+import com.reznik.jwtsecurity.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
