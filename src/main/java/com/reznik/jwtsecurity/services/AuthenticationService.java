@@ -4,7 +4,10 @@ import com.reznik.jwtsecurity.dto.AuthenticationRequest;
 import com.reznik.jwtsecurity.dto.AuthenticationResponse;
 import com.reznik.jwtsecurity.dto.AuthorizationRequest;
 import com.reznik.jwtsecurity.entity.Role;
+import com.reznik.jwtsecurity.entity.Token;
+import com.reznik.jwtsecurity.entity.TokenType;
 import com.reznik.jwtsecurity.entity.User;
+import com.reznik.jwtsecurity.repos.TokenRepository;
 import com.reznik.jwtsecurity.repos.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,14 +19,15 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
-    private final UserRepository repository;
+    private final UserRepository userRepository;
+    private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(AuthorizationRequest request) {
-        var existingUser = repository.findByEmail(request.getEmail());
-        if(existingUser.isPresent()){
+        var existingUser = userRepository.findByEmail(request.getEmail());
+        if (existingUser.isPresent()) {
             throw new UsernameNotFoundException("User with this email already exists");
         }
 
@@ -34,15 +38,15 @@ public class AuthenticationService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
                 .build();
-        repository.save(user);
+        var savedUser = userRepository.save(user);
         var jwtToken = jwtService.generateToken(user);
+
+        saveUserAccessToken(savedUser, jwtToken);
 
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
     }
-
-
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(
@@ -52,11 +56,37 @@ public class AuthenticationService {
                 )
         );
 
-        var user = repository.findByEmail(request.getEmail())
+        var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow();
         var jwtToken = jwtService.generateToken(user);
+        revokeAllUserTokens(user);
+        saveUserAccessToken(user, jwtToken);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
+    }
+
+    private void revokeAllUserTokens(User user){
+        var validUserTokens = tokenRepository.findAllValidTokensByUser(user.getId());
+        if(validUserTokens.isEmpty()) return;
+
+        validUserTokens.forEach(t -> {
+            t.setExpired(true);
+            t.setRevoked(true);
+        });
+        tokenRepository.saveAll(validUserTokens);
+
+
+    }
+
+    private void saveUserAccessToken(User user, String jwtToken) {
+        var token = Token.builder()
+                .user(user)
+                .accessToken(jwtToken)
+                .tokenType(TokenType.BEARER)
+                .expired(false)
+                .revoked(false)
+                .build();
+        tokenRepository.save(token);
     }
 }
