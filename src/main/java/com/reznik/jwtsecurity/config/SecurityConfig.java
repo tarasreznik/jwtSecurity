@@ -33,7 +33,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST, "/api/v1/authorize", "/api/v1/authenticate").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/authorize", "/api/v1/authenticate", "/api/v1/refresh-token").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/test/**").permitAll()
                         .anyRequest().authenticated()
                 )

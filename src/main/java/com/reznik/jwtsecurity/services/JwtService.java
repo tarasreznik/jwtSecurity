@@ -5,11 +5,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -20,7 +17,15 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
-    private static final String SECRET_KEY = "a904f5fe9eeea401d3503002f4325fbf102954544ce29b4becf9120815f78881";
+    @Value("${application.security.jwt.secret-key}")
+    private String secretKey;
+
+    @Value("${application.security.jwt.expiration}")
+    private long accessExpiration;
+
+    @Value("${application.security.jwt.refresh-token.expiration}")
+    private long refreshExpiration;
+
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -31,17 +36,25 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(UserDetails userDetails){
-        return generateToken(new HashMap<>(), userDetails);
+    public String generateAccessToken(UserDetails userDetails){
+        return generateAccessToken(new HashMap<>(), userDetails);
     }
 
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+    public String generateAccessToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        return buildJwtAccessToken(extraClaims, userDetails, accessExpiration);
+    }
+
+    public String generateRefreshToken(UserDetails userDetails) {
+        return buildJwtAccessToken(new HashMap<>(), userDetails, refreshExpiration);
+    }
+
+    private String buildJwtAccessToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration){
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 + 24))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -69,7 +82,7 @@ public class JwtService {
     }
 
     private Key getSignKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

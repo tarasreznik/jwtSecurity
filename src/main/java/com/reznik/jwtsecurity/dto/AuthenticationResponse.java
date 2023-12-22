@@ -1,5 +1,6 @@
 package com.reznik.jwtsecurity.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 @Data
@@ -7,6 +8,10 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthenticationResponse {
+    @JsonProperty("acess_token")
+    private String accessToken;
 
-    private String token;
+    @JsonProperty("refresh_token")
+    private String refreshToken;
+
 }
