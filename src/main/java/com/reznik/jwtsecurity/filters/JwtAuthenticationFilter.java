@@ -1,6 +1,6 @@
 package com.reznik.jwtsecurity.filters;
 
-import com.reznik.jwtsecurity.repos.TokenRepository;
+import com.reznik.jwtsecurity.repos.UserRepository;
 import com.reznik.jwtsecurity.services.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,7 +23,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
-    private final TokenRepository tokenRepository;
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -46,11 +46,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
-            var isTokenValid = tokenRepository.findByAccessToken(jwt)
-                    .map(t -> !t.isExpired() && !t.isRevoked())
-                    .orElse(false);
+            var user = userRepository.findByEmail(userEmail)
+                    .orElseThrow();
 
-            if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
+            boolean isUsersToken = user.getAccessToken().equals(jwt);
+
+            var isTokenValid = jwtService.isTokenValid(jwt, user);
+
+            if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid && isUsersToken) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken
                         (userDetails, null, userDetails.getAuthorities());
 

@@ -22,6 +22,6 @@ public class UserService {
 
     public User readUser() {
         Integer userId = getLoggedInUser().getId();
-        return userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found for id:" + userId));
+        return userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found for id:" + userId));
     }
 }

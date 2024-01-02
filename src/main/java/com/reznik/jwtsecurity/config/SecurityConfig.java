@@ -48,7 +48,7 @@ public class SecurityConfig {
 //                    lOut.invalidateHttpSession(true)
 //                            .clearAuthentication(true)
 //                            .logoutRequestMatcher(new AntPathRequestMatcher("/api/v1/auth/logout"))
-//                            .logoutSuccessUrl("/login?logout")
+//                            //.logoutSuccessUrl("/login?logout")
 //                            .permitAll();
                 });
 //        http.httpBasic(withDefaults());
